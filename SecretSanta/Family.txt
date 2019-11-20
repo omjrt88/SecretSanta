@@ -1,1 +1,20 @@
-﻿Omar Chepe=Marieta-Cristina,Marieta=Omar Chepe-Cristina,Cristina=Omar Chepe-Cristina,Geovanni=Ana-Marco-Carolina,Ana=Geovanni-Marco-Carolina,Marco=Ana-Geovanni-Carolina,Carolina=Ana-Marco-Geovanni,Marjorie=Omar Mora,Omar Mora=Marjorie,Nisida=Carol-David-Javier-Jorge-Luis Diego,Carol=Nisida-David-Javier-Jorge-Luis Diego,David=Carol-Nisida-Javier-Jorge-Luis Diego,Javier=Carol-David-Nisida-Jorge-Luis Diego,Luis Diego=Carol-David-Javier-Jorge-Nisida,Jorge=Carol-David-Javier-Nisida-Luis Diego,Aida=Carmen Edith,Carmen Edith=Aida,Isa,Juany,Pilar
+﻿Omar Chepe#88237198=Marieta-Cristina
+Marieta#86662194=Omar Chepe-Cristina
+Cristina#87835836=Omar Chepe-Cristina
+Geovanni#89124850=Ana-Marco-Carolina
+Ana#83887242=Geovanni-Marco-Carolina
+Marco=Ana-Geovanni-Carolina
+Carolina#86316566=Ana-Marco-Geovanni
+Marjorie#86019310=Omar Mora
+Omar Mora#86019310=Marjorie
+Nisida#88468163=Carol-David-Javier-Jorge-Luis Diego
+Carol#84891146=Nisida-David-Javier-Jorge-Luis Diego
+David#88300951=Carol-Nisida-Javier-Jorge-Luis Diego
+Javier#88111765=Carol-David-Nisida-Jorge-Luis Diego
+Luis Diego#85036611=Carol-David-Javier-Jorge-Nisida
+Jorge#85422860=Carol-David-Javier-Nisida-Luis Diego
+Aida#87626873=Carmen Edith
+Carmen Edith#8876 1174=Aida
+Isa#88183270
+Juany#83808802
+Pilar#89955635
