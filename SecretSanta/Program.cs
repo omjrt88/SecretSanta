@@ -3,21 +3,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
+using RestSharp;
 
 namespace SecretSanta
 {
     class MainClass
     {
-        private static string sentBtn = "//span[@data-icon='send']";
+        //private static string sentBtn = "//span[@data-icon='send']";
+        //private static string chromeProfile = @"user-data-dir=/Users/orodriguez/Library/Application Support/Google/Chrome/";
         public static void Main(string[] args)
         {
+            if (args == null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
+
             Console.WriteLine("Secret Santa!");
-            //LoadJson();
-            ConnectToWhatsApp("50688237198", "Secret Santa");
+            var family = LoadJson();
+            ComposeMessages(family);
         }
 
 
@@ -36,7 +44,10 @@ namespace SecretSanta
 
             return family.Select(person => new Person() 
             { 
-                Name = person.Split('=').FirstOrDefault(), 
+                Name = (person.Split('=').FirstOrDefault()).Split('#').FirstOrDefault(), 
+                Phone = (person.Split('=').FirstOrDefault()).Split('#').Length > 1
+                                                            ? (person.Split('=').FirstOrDefault()).Split('#').LastOrDefault()
+                                                            : null,
                 Exclusions = person.Split('=').Length > 1 
                                    ? GetExclusions(person.Split('=').LastOrDefault()) 
                                    : null 
@@ -50,6 +61,7 @@ namespace SecretSanta
 
         private static List<Person> SortSecretSanta(List<Person> family)
         {
+            List<string> amigoSecreto = new List<string>();
             foreach (Person person in family)
             {
                 var allowed = family.Where(x => x.Name != person.Name && !x.Targeted).ToList();
@@ -61,17 +73,35 @@ namespace SecretSanta
                 var target = allowed.OrderBy(emp => Guid.NewGuid()).ToList().First();
                 person.Target = target.Name;
                 target.Targeted = true;
-                Console.WriteLine($"{person.Name} => {person.Target}");
+                amigoSecreto.Add($"{person.Name} => {person.Target}");
+            }
+
+            using (StreamWriter file = 
+                   new StreamWriter(@"../../SortedFamily.txt"))
+            {
+                amigoSecreto.ForEach(x => file.WriteLine(x));
             }
 
             return family;
         }
 
+        private static void ComposeMessages(List<Person> family)
+        {
+            foreach (var person in family)
+            {
+                string message = $"Hola nuevamente {person.Name}. Como hasta Santa se equivoca, volvi a sortear el amigo secreto. Para esta navidad, tu amigo secreto es: *{person.Target}*. Jo Jo Jo!";
+                string phone = $"506{person.Phone}";
+                ConnectToWhatsApp(phone, message);
+            }
+        }
+        /*
         private static void ConnectToWhatsApp(string phone, string msg)
         {
+            Console.WriteLine($"Number:{phone}\n Message:{msg}");
             IWebDriver driver;
             var options = new ChromeOptions();
-            options.AddArguments(@"user-data-dir=/Users/orodriguez/Library/Application Support/Google/Chrome/");
+            options.AddArguments(new List<string>() { 
+                chromeProfile});
             driver = new ChromeDriver(options);
             try
             {
@@ -83,41 +113,30 @@ namespace SecretSanta
                 var button = wait.Until(d => 
                            d.FindElement(locator));
                 wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(By.XPath(sentBtn)));
+                Thread.Sleep(2000);
                 button.Click();
             }
             finally
             {
                 driver.Close();
             }
-        }
+        }*/
 
-        private static void SendMessage()
+
+        private static void ConnectToWhatsApp(string to, string text)
         {
-            string yourId = "BL1udPQscUCKUg6VQ7vOBG9tanJ0ODhfYXRfZ21haWxfZG90X2NvbQ==";
-            string yourMobile = "+50687835836";
-            string yourMessage = "Probando Secret Santa desde c#. Por cierto, te amo preciosa! :*";
+            //Console.WriteLine($"Number:{to}\n Message:{text}");
+            var token = "d926c26249e46e7b1d27368c4baee49b5dd402a1d831b";
+            var uid = "50688237198";
+            var custom_uid = $"omr - {Guid.NewGuid()}";
 
-            try
-            {
-                string url = "https://NiceApi.net/API";
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Method = "POST";
-                request.ContentType = "application/x-www-form-urlencoded";
-                request.Headers.Add("X-APIId", yourId);
-                request.Headers.Add("X-APIMobile", yourMobile);
-                using (StreamWriter streamOut = new StreamWriter(request.GetRequestStream()))
-                {
-                    streamOut.Write(yourMessage);
-                }
-                using (StreamReader streamIn = new StreamReader(request.GetResponse().GetResponseStream()))
-                {
-                    Console.WriteLine(streamIn.ReadToEnd());
-                }
-            }
-            catch (SystemException se)
-            {
-                Console.WriteLine(se.Message);
-            }
+            var client = new RestClient($"https://www.waboxapp.com/ajax/sandbox/send_chat?strict=1&token={token}&uid={uid}&to={to}&custom_uid={custom_uid}&text={text}&api=1");
+            var request = new RestRequest(Method.GET);
+            //request.AddHeader("content-type", "application/x-www-form-urlencoded");
+            //request.AddParameter("application/x-www-form-urlencoded", $"token=m{token}&uid={uid}&to={to}&custom_uid={custom_uid}&text={text}", ParameterType.RequestBody);
+            IRestResponse response = client.Execute(request);
+
+            Console.WriteLine(response.StatusCode);
         }
     }
 }
